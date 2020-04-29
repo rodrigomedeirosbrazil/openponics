@@ -4,7 +4,7 @@
   "description": "Open software and open hardware to cultive vegetables and more",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js --ignore __tests__",
+    "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
   "repository": {

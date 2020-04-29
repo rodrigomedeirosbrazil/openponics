@@ -1,11 +1,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const db = require('../database/connection')
 
 const login = async function (req, res) {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    // const user = await User.getByEmail(email);
+    const user = await db('users').where('name', username).first()
     if (!user) return res.status(404).json({ message: "Email ou senha inválidos (1)" });
 
     if (await bcrypt.compare(password, user.password)) {
@@ -15,43 +16,12 @@ const login = async function (req, res) {
       user.password = ''; // hide password hash
       return res.json({ user, token });
     }
-
     return res.status(404).json({ message: "Email ou senha inválidos" });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: error });
   }
 };
-
-
-const recoveryPassword = async function (req, res) {
-  try {
-    const { email } = req.body;
-
-    const user = await User.getByEmail(email);
-    if (!user) return res.status(404).json({ message: "Email não encontrado" });
-
-    const newPassword = createPassword(10);
-
-    user.password = newPassword;
-
-    await User.update(user)
-
-    const newEmail = {
-      from: "Pulsar Connect <contato@pulsarpay.com>",
-      to: email,
-      subject: "Recuperação da senha",
-      text:
-        `Você pediu a recuperação da senha, segue a senha que foi gerada:
-      ${newPassword}
-      `
-    };
-
-    await mail.sendMail(newEmail);
-    return res.status(200).json({ message: "Email enviado!" });
-  } catch (error) {
-    return res.status(500).json({ message: error });
-  }
-}
 
 const changePassword = async function (req, res) {
   try {
@@ -59,16 +29,15 @@ const changePassword = async function (req, res) {
 
     const id = req.userId
 
-    // const user = await User.getWithPassword(id);
+    const user = await db('users').where('id', id).first()
+
     if (!user) return res.status(404).json({ message: "Você precisa estar logado no sistema." });
 
     const valid = await bcrypt.compare(oldPassword, user.password)
 
     if (!valid) return res.status(404).json({ message: "Senha antiga inválida." });
 
-    user.password = newPassword;
-
-    await User.update(user)
+    await db('users').where('id', id).update({ password: bcrypt.hashSync(newPassword)})
 
     return res.status(200).json({ message: "Senha alterada com sucesso!" });
   } catch (error) {
@@ -103,8 +72,6 @@ const verifyJwt = (req, res, next) => {
 
 module.exports = {
   login,
-  signup,
-  recoveryPassword,
   changePassword,
   verifyJwt
 };
