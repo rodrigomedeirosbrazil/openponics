@@ -1,6 +1,8 @@
-const raspiInit = require('../utils/raspiInit');
 const I2C = require('raspi-i2c').I2C;
 const ADS1x15 = require('raspi-kit-ads1x15');
+
+const raspiInit = require('../utils/raspiInit');
+const average = require('../utils/average');
 
 module.exports = async () => {
   await raspiInit();
@@ -12,14 +14,7 @@ module.exports = async () => {
     reads.push(await readChannel(adc));
   }
 
-  reads.sort()
-  reads.splice(0, 1) // remove lower value
-  reads.splice(-1, 1) // remove high value
-  const readsAvg = reads.reduce(function (a, b) {
-      return a + b
-    }, 0) / reads.length;
-
-  return readsAvg.toFixed(2);
+  return average(reads);
 }
 
 const readChannel = adc => {
@@ -44,3 +39,4 @@ const getAdc = i2c => {
     sps: ADS1x15.spsADS1015.SPS_250         // data rate (samples per second)
   });
 }
+

@@ -13,6 +13,6 @@ routes.post('/auth/login', logToConsole, auth.login);
 routes.post('/auth/changePassword', logToConsole, auth.verifyJwt, auth.changePassword);
 
 routes.get('/sensor/ph', logToConsole, auth.verifyJwt, sensor.ph);
-// routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
+routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
 
 module.exports = routes;

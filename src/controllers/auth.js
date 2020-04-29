@@ -10,7 +10,7 @@ const login = async function (req, res) {
     if (!user) return res.status(404).json({ message: "Email ou senha inválidos (1)" });
 
     if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ id: user.id }, process.env.JWT_KEY | 'secret', {
+      const token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
         expiresIn: '6h'
       });
       user.password = ''; // hide password hash
@@ -19,7 +19,7 @@ const login = async function (req, res) {
     return res.status(404).json({ message: "Email ou senha inválidos" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: error });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -41,7 +41,7 @@ const changePassword = async function (req, res) {
 
     return res.status(200).json({ message: "Senha alterada com sucesso!" });
   } catch (error) {
-    return res.status(500).json({ message: error });
+    return res.status(500).json({ message: error.message });
   }
 
 }
@@ -50,20 +50,20 @@ const verifyJwt = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader)
-    return res.status(401).send({ error: 'No token provided' });
+    return res.status(401).send({ message: 'No token provided' });
 
   const parts = authHeader.split(' ');
 
   if (!parts.length === 2)
-    return res.status(401).send({ error: 'Token error' });
+    return res.status(401).send({ message: 'Token error' });
 
   const [scheme, token] = parts;
 
   if (!/^Bearer$/i.test(scheme))
-    return res.status(401).send({ error: 'Token malformatted' });
+    return res.status(401).send({ message: 'Token malformatted' });
 
   jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
-    if (err) return res.status(401).send({ error: 'Token invalid' });
+    if (err) return res.status(401).send({ message: 'Token invalid' });
 
     req.userId = decoded.id;
     return next();
