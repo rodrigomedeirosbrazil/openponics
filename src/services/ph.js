@@ -6,7 +6,20 @@ module.exports = async () => {
   await raspiInit();
   const i2c = new I2C();
   const adc = getAdc(i2c);
-  return await readChannel(adc);
+  const reads = [];
+
+  for (let i = 0; i < 10; i++) {
+    reads.push(await readChannel(adc));
+  }
+
+  reads.sort()
+  reads.splice(0, 1) // remove lower value
+  reads.splice(-1, 1) // remove high value
+  const readsAvg = reads.reduce(function (a, b) {
+      return a + b
+    }, 0) / reads.length;
+
+  return readsAvg.toFixed(2);
 }
 
 const readChannel = adc => {
@@ -14,7 +27,7 @@ const readChannel = adc => {
     // Get a single-ended reading from channel-0 and display the results
     adc.readChannel(ADS1x15.channel.CHANNEL_0, (err, value, volts) => {
       if (err) reject(new Error('Failed to fetch value from ADC', err));
-      resolve({ value, volts })
+      resolve(volts)
     });
   });
 }

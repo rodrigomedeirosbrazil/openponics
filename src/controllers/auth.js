@@ -10,7 +10,7 @@ const login = async function (req, res) {
     if (!user) return res.status(404).json({ message: "Email ou senha inválidos (1)" });
 
     if (await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ id: user.id }, process.env.JWT_KEY, {
+      const token = jwt.sign({ id: user.id }, process.env.JWT_KEY | 'secret', {
         expiresIn: '6h'
       });
       user.password = ''; // hide password hash
