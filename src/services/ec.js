@@ -17,9 +17,10 @@ module.exports = () => {
       reject(new Error('Serial timeout'));
     }, 5000)
     const data = await readLine(serial)
-    await closeSerial(serial)
     clearTimeout(timeout);
-    resolve(data);
+    const [, electricCondutivity] = data.split(':')
+    await closeSerial(serial)
+    resolve(electricCondutivity);
   })
 }
 
