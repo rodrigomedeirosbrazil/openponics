@@ -8,17 +8,19 @@ const SERIAL_OPTIONS = {
   baudRate: 300
 }
 
-module.exports = async () => {
-  await raspiInit()
-  const serial = new Serial(SERIAL_OPTIONS)
-  await openSerial(serial)
-  const timeout = setTimeout( () => {
-    throw new Error('Serial timeout');
-  }, 5000)
-  const data = await readLine(serial)
-  await closeSerial(serial)
-  clearTimeout(timeout);
-  return data;
+module.exports = () => {
+  return new Promise( async (resolve, reject) => {
+    await raspiInit()
+    const serial = new Serial(SERIAL_OPTIONS)
+    await openSerial(serial)
+    const timeout = setTimeout( () => {
+      reject(new Error('Serial timeout'));
+    }, 5000)
+    const data = await readLine(serial)
+    await closeSerial(serial)
+    clearTimeout(timeout);
+    resolve(data);
+  })
 }
 
 const readLine = async serial => {
