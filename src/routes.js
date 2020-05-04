@@ -3,6 +3,8 @@ const routes = Router();
 
 const auth = require('./controllers/auth');
 const sensor = require('./controllers/sensor');
+const pump = require('./controllers/pump');
+const relay = require('./controllers/relay');
 
 const logToConsole = (req, res, next) => {
   console.log(req.method + ' ' + req.url)
@@ -14,5 +16,12 @@ routes.post('/auth/changePassword', logToConsole, auth.verifyJwt, auth.changePas
 
 routes.get('/sensor/ph', logToConsole, auth.verifyJwt, sensor.ph);
 routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
+
+routes.post('/pump/:number', logToConsole, auth.verifyJwt, pump.pulse);
+
+routes.get('/relay/:number', logToConsole, auth.verifyJwt, relay.getState);
+routes.post('/relay/on/:number', logToConsole, auth.verifyJwt, relay.on);
+routes.post('/relay/off/:number', logToConsole, auth.verifyJwt, relay.off);
+
 
 module.exports = routes;
