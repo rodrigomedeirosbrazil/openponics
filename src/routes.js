@@ -17,7 +17,9 @@ routes.post('/auth/changePassword', logToConsole, auth.verifyJwt, auth.changePas
 routes.get('/sensor/ph', logToConsole, auth.verifyJwt, sensor.ph);
 routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
 
-routes.post('/pump/:number', logToConsole, auth.verifyJwt, pump.pulse);
+routes.post('/pump/calibrate', logToConsole, auth.verifyJwt, pump.calibrate);
+routes.post('/pump/pulse/:number', logToConsole, auth.verifyJwt, pump.pulse);
+routes.post('/pump/:number', logToConsole, auth.verifyJwt, pump.work);
 
 routes.get('/relay/:number', logToConsole, auth.verifyJwt, relay.getState);
 routes.post('/relay/on/:number', logToConsole, auth.verifyJwt, relay.on);
