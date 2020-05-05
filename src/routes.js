@@ -21,9 +21,9 @@ routes.post('/pump/calibrate', logToConsole, auth.verifyJwt, pump.calibrate);
 routes.post('/pump/pulse/:number', logToConsole, auth.verifyJwt, pump.pulse);
 routes.post('/pump/:number', logToConsole, auth.verifyJwt, pump.work);
 
-routes.get('/relay/:number', logToConsole, auth.verifyJwt, relay.getState);
 routes.post('/relay/on/:number', logToConsole, auth.verifyJwt, relay.on);
 routes.post('/relay/off/:number', logToConsole, auth.verifyJwt, relay.off);
+routes.get('/relay/:number', logToConsole, auth.verifyJwt, relay.getState);
 
 
 module.exports = routes;

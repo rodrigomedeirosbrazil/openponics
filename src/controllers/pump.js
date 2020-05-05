@@ -3,14 +3,14 @@ const delay = require('../utils/delay');
 const db = require('../database/connection')
 
 const pumpGpio = {
-  1: 'GPIO24', // Pump 1 - pin 35
-  2: 'GPIO23', // Pump 2 - pin 33
-  3: 'GPIO22', // Pump 3 - pin 31
-  4: 'GPIO21', // Pump 4 - pin 29
-  5: 'GPIO30', // Pump 5 - pin 27
-  // 1: 'GPIO14', // Relay 1 - pin 23
-  // 2: 'GPIO13', // Relay 2 - pin 21
-  // 3: 'GPIO12', // Relay 3 - pin 19
+  1: 'P1-35', // Pump 1 - pin 35
+  2: 'P1-33', // Pump 2 - pin 33
+  3: 'P1-31', // Pump 3 - pin 31
+  4: 'P1-29', // Pump 4 - pin 29
+  5: 'P1-27', // Pump 5 - pin 27
+  // 1: 'P1-23', // Relay 1 - pin 23
+  // 2: 'P1-21', // Relay 2 - pin 21
+  // 3: 'P1-19', // Relay 3 - pin 19
 }
 
 const work = async function (req, res) {
@@ -65,8 +65,6 @@ const calibrate = async function (req, res) {
     .catch( async error => {
       if (error.code == 'SQLITE_CONSTRAINT') {
         await db('calibrations').where('key', 'pump').update({ value: millilitersPerSecond })
-      } else {
-        throw error
       }
     })
 
