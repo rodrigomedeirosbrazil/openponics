@@ -1,4 +1,5 @@
 const relayService = require('../services/relay');
+const db = require('../database/connection')
 
 const relayGpio = {
   // 1: 'P1-35', // Pump 1 - pin 35
@@ -20,6 +21,14 @@ const on = async function (req, res) {
     if (!pin) return res.status(400).json({ message: 'Relay pin not found' });
 
     await relayService.on(pin);
+
+    await db('relays').insert({ id: number, state: true})
+      .catch(async error => {
+        if (error.code == 'SQLITE_CONSTRAINT') {
+          await db('relays').where('id', number).update({ state: true })
+        }
+      })
+
     return res.json({message: 'Relay ON'});
   } catch (error) {
     console.log(error)
@@ -37,6 +46,14 @@ const off = async function (req, res) {
     if (!pin) return res.status(400).json({ message: 'Relay pin not found' });
 
     await relayService.off(pin);
+
+    await db('relays').insert({ id: number, state: false })
+      .catch(async error => {
+        if (error.code == 'SQLITE_CONSTRAINT') {
+          await db('relays').where('id', number).update({ state: false })
+        }
+      })
+
     return res.json({ message: 'Relay OFF' });
   } catch (error) {
     console.log(error)
@@ -48,13 +65,11 @@ const getState = async function (req, res) {
   try {
     const { number } = req.params;
 
-    const pin = relayGpio[number]
+    const relay = await db('relays').where('id', number).first()
+    if (!relay) return res.status(404).json({ message: "Relay state not found" });
 
-    if (!pin) return res.status(400).json({ message: 'Relay pin not found' });
-
-    const state = await relayService.getState(pin);
-    const message = state ? 'Relay ON' : 'Relay OFF'
-    return res.json({ message, state });
+    const message = relay.state ? 'Relay ON' : 'Relay OFF'
+    return res.json({ message, state: relay.state });
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });

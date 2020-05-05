@@ -16,15 +16,4 @@ const off = async (pin) => {
   output.write(gpio.LOW);
 }
 
-const getstate = async (pin) => {
-  await raspiInit();
-
-  const input = new gpio.DigitalInput({
-    pin: pin,
-    pullResistor: gpio.PULL_NONE
-  });
-
-  return input.read()
-}
-
-module.exports = { on, off, getstate }
+module.exports = { on, off }
