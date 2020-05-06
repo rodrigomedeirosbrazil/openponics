@@ -3,8 +3,19 @@ const ecService = require('../services/ec');
 
 const ph = async function (req, res) {
   try {
-    const readPh = await phService();
-    return res.json(readPh);
+    const readPh = await phService.readPh();
+    return res.json({ ph: readPh });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const phCalibrate = async function (req, res) {
+  try {
+    const { phDifference } = req.body;
+    await phService.setCalibration(phDifference);
+    return res.json({ message: 'PH calibration OK!' });
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });
@@ -14,7 +25,7 @@ const ph = async function (req, res) {
 const ec = async function (req, res) {
   try {
     const readEc = await ecService();
-    return res.json(readEc);
+    return res.json({ ec: readEc });
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });
@@ -22,5 +33,5 @@ const ec = async function (req, res) {
 };
 
 module.exports = {
-  ph, ec
+  ph, phCalibrate, ec
 };

@@ -2,9 +2,10 @@ const I2C = require('raspi-i2c').I2C;
 const ADS1x15 = require('raspi-kit-ads1x15');
 
 const raspiInit = require('../utils/raspiInit');
-const average = require('../utils/average');
+const delay = require('../utils/delay');
+const db = require('../database/connection')
 
-module.exports = async () => {
+const readPh = async () => {
   await raspiInit();
   const i2c = new I2C();
   const adc = getAdc(i2c);
@@ -12,9 +13,25 @@ module.exports = async () => {
 
   for (let i = 0; i < 10; i++) {
     reads.push(await readChannel(adc));
+    await delay(30);
   }
 
-  return average(reads);
+  const avgValue = average(reads);
+  const calibration = await db('calibrations').where('key', 'ph').first()
+
+  const phCalibration = calibration ? calibration.value : 0
+
+  const pHVol = avgValue * 5.0 / 1024 / 6;
+  return -5.70 * pHVol + phCalibration;
+}
+
+const setCalibration = async phDifference => {
+  await db('calibrations').insert({ key: 'ph', value: phDifference })
+    .catch(async error => {
+      if (error.code == 'SQLITE_CONSTRAINT') {
+        await db('calibrations').where('key', 'ph').update({ value: phDifference })
+      }
+    })
 }
 
 const readChannel = adc => {
@@ -40,3 +57,14 @@ const getAdc = i2c => {
   });
 }
 
+const average = ar => {
+  ar.sort()
+  ar.splice(0, 2) // remove lowers value
+  ar.splice(-2, 2) // remove highers value
+  return ar.reduce(function (a, b) {
+    console.log(b)
+    return a + b
+  }, 0) / ar.length;
+}
+
+module.exports = { readPh, setCalibration }

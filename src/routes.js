@@ -15,6 +15,7 @@ routes.post('/auth/login', logToConsole, auth.login);
 routes.post('/auth/changePassword', logToConsole, auth.verifyJwt, auth.changePassword);
 
 routes.get('/sensor/ph', logToConsole, auth.verifyJwt, sensor.ph);
+routes.post('/sensor/phCalibrate', logToConsole, auth.verifyJwt, sensor.phCalibrate);
 routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
 
 routes.post('/pump/calibrate', logToConsole, auth.verifyJwt, pump.calibrate);
