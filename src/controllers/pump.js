@@ -5,9 +5,9 @@ const work = async function (req, res) {
     const { number } = req.params;
     const { milliliters } = req.body;
 
-    pumpService.work(number, milliliters);
+    await pumpService.work(number, milliliters);
 
-    return res.json({ message: 'Pulse OK' });
+    return res.json({ message: 'Work OK' });
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });
@@ -19,7 +19,7 @@ const pulse = async function (req, res) {
     const { number } = req.params;
     const { miliseconds } = req.body;
 
-    pumpService.pulse(number, miliseconds);
+    await pumpService.pulse(number, miliseconds);
 
     return res.json({message: 'Pulse OK'});
   } catch (error) {
@@ -32,7 +32,7 @@ const calibrate = async function (req, res) {
   try {
     const { millilitersPerSecond } = req.body;
 
-    pumpService.calibrate(millilitersPerSecond);
+    await pumpService.calibrate(millilitersPerSecond);
 
     return res.json({ message: 'Calibrate OK' });
   } catch (error) {
