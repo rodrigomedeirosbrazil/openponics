@@ -25,7 +25,28 @@ const phCalibrate = async function (req, res) {
 const ec = async function (req, res) {
   try {
     const readEc = await ecService();
-    return res.json({ ec: readEc });
+    return res.json({ ec: readEc.electricCondutivity });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const waterTemperature = async function (req, res) {
+  try {
+    const readEc = await ecService();
+    return res.json({ ec: readEc.waterTemperature });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const ecCalibrate = async function (req, res) {
+  try {
+    const { ecDifference } = req.body;
+    await ecService.setCalibration(ecDifference);
+    return res.json({ message: 'EC calibration OK!' });
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });
@@ -33,5 +54,5 @@ const ec = async function (req, res) {
 };
 
 module.exports = {
-  ph, phCalibrate, ec
+  ph, phCalibrate, ec, ecCalibrate, waterTemperature
 };

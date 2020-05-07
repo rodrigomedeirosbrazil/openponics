@@ -1,6 +1,7 @@
 const Serial = require('raspi-serial').Serial;
 
 const raspiInit = require('../utils/raspiInit');
+const db = require('../database/connection')
 
 const DELIMITER = Buffer.from('\r\n');
 const SERIAL_OPTIONS = {
@@ -8,7 +9,17 @@ const SERIAL_OPTIONS = {
   baudRate: 300
 }
 
-module.exports = () => {
+const setCalibration = async ecDifference => {
+  await db('calibrations').insert({ key: 'ec', value: ecDifference })
+    .catch(async error => {
+      if (error.code == 'SQLITE_CONSTRAINT') {
+        await db('calibrations').where('key', 'ec').update({ value: ecDifference })
+      }
+    })
+}
+
+const readEc = () => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise( async (resolve, reject) => {
     await raspiInit()
     const serial = new Serial(SERIAL_OPTIONS)
@@ -18,9 +29,14 @@ module.exports = () => {
     }, 5000)
     const data = await readLine(serial)
     clearTimeout(timeout);
-    const [, electricCondutivity] = data.split(':')
+    const [ waterTemperature, ec ] = data.split(':')
+
+    const calibration = await db('calibrations').where('key', 'ec').first()
+    const ecCalibration = calibration ? calibration.value : 0
+    const electricCondutivity = ec + ecCalibration
+
     await closeSerial(serial)
-    resolve(electricCondutivity);
+    resolve({ waterTemperature, electricCondutivity });
   })
 }
 
@@ -80,3 +96,5 @@ const readSerial = serial => {
     }
   })
 }
+
+module.exports = { readEc, setCalibration }

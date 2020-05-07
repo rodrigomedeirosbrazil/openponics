@@ -15,8 +15,10 @@ routes.post('/auth/login', logToConsole, auth.login);
 routes.post('/auth/changePassword', logToConsole, auth.verifyJwt, auth.changePassword);
 
 routes.get('/sensor/ph', logToConsole, auth.verifyJwt, sensor.ph);
-routes.post('/sensor/phCalibrate', logToConsole, auth.verifyJwt, sensor.phCalibrate);
+routes.post('/sensor/ph/calibrate', logToConsole, auth.verifyJwt, sensor.phCalibrate);
 routes.get('/sensor/ec', logToConsole, auth.verifyJwt, sensor.ec);
+routes.post('/sensor/ec/calibrate', logToConsole, auth.verifyJwt, sensor.ecCalibrate);
+routes.get('/sensor/waterTemperature', logToConsole, auth.verifyJwt, sensor.waterTemperature);
 
 routes.post('/pump/calibrate', logToConsole, auth.verifyJwt, pump.calibrate);
 routes.post('/pump/pulse/:number', logToConsole, auth.verifyJwt, pump.pulse);
