@@ -24,7 +24,7 @@ const phCalibrate = async function (req, res) {
 
 const ec = async function (req, res) {
   try {
-    const readEc = await ecService();
+    const readEc = await ecService.readEc();
     return res.json({ ec: readEc.electricCondutivity });
   } catch (error) {
     console.log(error)
@@ -34,7 +34,7 @@ const ec = async function (req, res) {
 
 const waterTemperature = async function (req, res) {
   try {
-    const readEc = await ecService();
+    const readEc = await ecService.readEc();
     return res.json({ ec: readEc.waterTemperature });
   } catch (error) {
     console.log(error)
