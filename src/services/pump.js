@@ -2,6 +2,7 @@ const relayService = require('./relay');
 const delay = require('../utils/delay');
 const CustomError = require('../utils/CustomError');
 const db = require('../database/connection')
+const upsert = require('../database/upsert')
 
 const pumpGpio = {
   1: process.env.PUMP_1_PIN || 'P1-35',
@@ -30,12 +31,7 @@ const pulse = async (number, miliseconds) => {
 };
 
 const calibrate = async millilitersPerSecond => {
-  await db('calibrations').insert({ key: 'pump', value: millilitersPerSecond })
-    .catch(async error => {
-      if (error.code == 'SQLITE_CONSTRAINT') {
-        await db('calibrations').where('key', 'pump').update({ value: millilitersPerSecond })
-      }
-    })
+  await upsert('calibrations', { key: 'pump' }, { value: millilitersPerSecond })
 };
 
 module.exports = { pulse, work, calibrate }

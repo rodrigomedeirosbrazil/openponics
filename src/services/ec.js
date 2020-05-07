@@ -2,6 +2,7 @@ const Serial = require('raspi-serial').Serial;
 
 const raspiInit = require('../utils/raspiInit');
 const db = require('../database/connection')
+const upsert = require('../database/upsert')
 
 const DELIMITER = Buffer.from('\r\n');
 const SERIAL_OPTIONS = {
@@ -10,12 +11,7 @@ const SERIAL_OPTIONS = {
 }
 
 const setCalibration = async ecDifference => {
-  await db('calibrations').insert({ key: 'ec', value: ecDifference })
-    .catch(async error => {
-      if (error.code == 'SQLITE_CONSTRAINT') {
-        await db('calibrations').where('key', 'ec').update({ value: ecDifference })
-      }
-    })
+  await upsert('calibrations', { key: 'ec' }, { value: ecDifference })
 }
 
 const readEc = () => {

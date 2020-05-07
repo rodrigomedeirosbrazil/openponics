@@ -4,6 +4,7 @@ const ADS1x15 = require('raspi-kit-ads1x15');
 const raspiInit = require('../utils/raspiInit');
 const delay = require('../utils/delay');
 const db = require('../database/connection')
+const upsert = require('../database/upsert')
 
 const readPh = async () => {
   await raspiInit();
@@ -26,12 +27,7 @@ const readPh = async () => {
 }
 
 const setCalibration = async phDifference => {
-  await db('calibrations').insert({ key: 'ph', value: phDifference })
-    .catch(async error => {
-      if (error.code == 'SQLITE_CONSTRAINT') {
-        await db('calibrations').where('key', 'ph').update({ value: phDifference })
-      }
-    })
+  await upsert('calibrations', { key: 'ph'}, { value: phDifference })
 }
 
 const readChannel = adc => {

@@ -2,6 +2,7 @@ const gpio = require('raspi-gpio');
 
 const raspiInit = require('../utils/raspiInit');
 const db = require('../database/connection')
+const upsert = require('../database/upsert')
 const CustomError = require('../utils/CustomError');
 
 const relayGpio = {
@@ -19,12 +20,7 @@ const setState = async (number, state) => {
   const output = new gpio.DigitalOutput(pin);
   output.write(state ? gpio.HIGH : gpio.LOW);
 
-  await db('relays').insert({ id: number, state: true })
-    .catch(async error => {
-      if (error.code == 'SQLITE_CONSTRAINT') {
-        await db('relays').where('id', number).update({ state })
-      }
-    })
+  await upsert('relays', { id: number }, { state })
 }
 
 const getState = async number => {
