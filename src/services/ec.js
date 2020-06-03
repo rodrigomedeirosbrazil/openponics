@@ -10,8 +10,8 @@ const SERIAL_OPTIONS = {
   baudRate: 300
 }
 
-const setCalibration = async ecDifference => {
-  await upsert('calibrations', { key: 'ec' }, { value: ecDifference })
+const setCalibration = async (ec, value) => {
+  await upsert('ec_calibrations', { key: 'ec' }, { ec, value })
 }
 
 const readEc = () => {
@@ -27,13 +27,17 @@ const readEc = () => {
     clearTimeout(timeout);
     const [ waterTemperature, ec ] = data.split(':')
 
-    const calibration = await db('calibrations').where('key', 'ec').first()
-    const ecCalibration = calibration ? calibration.value : 0
+    const ecCalibration = await getCalibration()
     const electricCondutivity = ec + ecCalibration
 
     await closeSerial(serial)
     resolve({ waterTemperature, electricCondutivity });
   })
+}
+
+const getCalibration = async () => {
+  const calibration = await db('ec_calibrations').orderBy('ec', 'desc').first()
+  return calibration.ec - calibration.value
 }
 
 const readLine = async serial => {
