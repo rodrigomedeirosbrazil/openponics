@@ -17,17 +17,12 @@ const readPh = async () => {
     await delay(30);
   }
 
-  const avgValue = average(reads);
-  const calibration = await db('calibrations').where('key', 'ph').first()
-
-  const phCalibration = calibration ? calibration.value : 0
-
-  const pHVol = avgValue * 5.0 / 1024 / 6;
-  return -5.70 * pHVol + phCalibration;
+  const avgVoltageValue = average(reads);
+  return calcPhWithCalibration(avgVoltageValue)
 }
 
-const setCalibration = async phDifference => {
-  await upsert('calibrations', { key: 'ph'}, { value: phDifference })
+const setCalibration = async (ph, value) => {
+  await upsert('ph_calibrations', { key: 'ph' }, { ph, value })
 }
 
 const readChannel = adc => {
@@ -38,6 +33,17 @@ const readChannel = adc => {
       resolve(volts)
     });
   });
+}
+
+const calcPhWithCalibration = async voltage => {
+  const phs = await db('ph_calibration').orderBy('ph', 'desc');
+
+  if (phs.length < 2 ) {
+    new Error('Need to set calibration with 2 points')
+  }
+  const m = (phs[0].ph - phs[1].ph) / (phs[0].value - phs[1].value)
+  const b = ((m * phs[1].value) - phs[1].ph) * -1
+  return (m * voltage) + b
 }
 
 const getAdc = i2c => {
