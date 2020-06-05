@@ -21,7 +21,7 @@ const setState = async (pin, state) => {
 const getState = async pin => {
   const dbPin = await db('pins').where('pin', pin).first()
   if (!dbPin) throw new CustomError('Pin not set', 'PIN_NOT_SET');
-  return dbPin.state
+  return dbPin
 }
 
 const pump = async (pin, milliliters) => {

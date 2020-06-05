@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 const api = require('./services/api')
-const db = require('../database/connection')
+const db = require('./database/connection')
 
 console.log('Connecting to ' + process.env.API_URL);
 
