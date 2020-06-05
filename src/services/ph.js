@@ -39,7 +39,7 @@ const calcPhWithCalibration = async voltage => {
   const phs = await db('ph_calibration').orderBy('ph', 'desc');
 
   if (phs.length < 2 ) {
-    new Error('Need to set calibration with 2 points')
+    throw new Error('Need to set calibration with 2 points')
   }
   const m = (phs[0].ph - phs[1].ph) / (phs[0].value - phs[1].value)
   const b = ((m * phs[1].value) - phs[1].ph) * -1
