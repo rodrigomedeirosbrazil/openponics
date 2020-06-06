@@ -22,6 +22,6 @@ routes.get('/sensor/waterTemperature', logToConsole, auth.verifyJwt, sensor.wate
 routes.post('/pin/on/:pin', logToConsole, auth.verifyJwt, pin.on);
 routes.post('/pin/off/:pin', logToConsole, auth.verifyJwt, pin.off);
 routes.post('/pin/pump/:pin', logToConsole, auth.verifyJwt, pin.pump);
-routes.get('/pin/:number', logToConsole, auth.verifyJwt, pin.getState);
+routes.get('/pin/:pin', logToConsole, auth.verifyJwt, pin.getState);
 
 module.exports = routes;
