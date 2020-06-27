@@ -6,6 +6,14 @@ const upsert = require('../database/upsert')
 const CustomError = require('../utils/CustomError');
 const delay = require('../utils/delay');
 
+const turnOn = pin => {
+  return setState(pin, true)
+}
+
+const turnOff = pin => {
+  return setState(pin, false)
+}
+
 const setState = async (pin, state) => {
   await raspiInit();
 
@@ -39,4 +47,4 @@ const pump = async (pin, milliliters) => {
   await setState(pin, false);
 };
 
-module.exports = { setState, getState, pump }
+module.exports = { setState, getState, pump, turnOn, turnOff }

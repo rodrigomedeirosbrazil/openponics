@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const api = require('./services/api')
 const db = require('./database/connection')
+const pinService = require('./services/pin');
 
 const worker = async () => {
   console.log('Getting data...');
@@ -23,11 +24,24 @@ const worker = async () => {
 
     if (res.status === 200) {
       console.log(res.data);
+      commandProcessor(res.data.commands);
     }
 
   } catch (error) {
     console.log('erro', error);
   }
+}
+
+const commandsStrategy = {
+  pin_on: pinService.turnOn,
+  pin_off: pinService.turnOff,
+  pump: pinService.pump,
+}
+
+const commandProcessor = commands => {
+  commands.map( command => {
+    commandsStrategy[command.command](...command.params);
+  });
 }
 
 worker();
